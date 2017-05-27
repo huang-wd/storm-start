@@ -1,4 +1,4 @@
-package org.apache.storm.chapter1.spout;
+package org.apache.storm.spout;
 
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -20,7 +20,9 @@ public class SentenceSpout extends BaseRichSpout {
     private int index = 0;
 
     private String[] sentences = {
-            ""
+            "This article is about the cat species that is commonly kept as a pet. For the cat family",
+            "Since cats were venerated in ancient Egypt, they were commonly believed to have been domesticated there",
+            "As of a 2007 study cats are the second most popular pet in the US by number of pets owned behind"
     };
 
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
@@ -38,6 +40,5 @@ public class SentenceSpout extends BaseRichSpout {
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declare(new Fields("sentence"));
-
     }
 }

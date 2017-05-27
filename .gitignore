@@ -144,3 +144,4 @@ chapter1/src/test/
 storm-start.iml
 /chapter1/chapter1.iml
 chapter1/target/
+/logs/
