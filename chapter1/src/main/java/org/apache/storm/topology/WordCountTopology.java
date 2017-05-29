@@ -35,6 +35,7 @@ public class WordCountTopology {
 
         // SplitSentenceBolt --> WordCountBolt
         builder.setBolt(COUNT_BOLT_ID, countBolt, 4)
+                //.shuffleGrouping(SPLIT_BOLT_ID);
                 .fieldsGrouping(SPLIT_BOLT_ID, new Fields("word"));
 
         // WordCountBolt --> ReportBolt
@@ -42,7 +43,7 @@ public class WordCountTopology {
                 .globalGrouping(COUNT_BOLT_ID);
 
         Config config = new Config();
-        config.setNumWorkers(1);
+        config.setNumWorkers(2);
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());

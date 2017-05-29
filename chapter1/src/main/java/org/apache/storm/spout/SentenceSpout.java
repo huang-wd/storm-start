@@ -7,7 +7,9 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import org.apache.storm.utils.Utils;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by huangweidong on 2017/5/25
@@ -15,6 +17,8 @@ import java.util.Map;
 public class SentenceSpout extends BaseRichSpout {
 
     private SpoutOutputCollector collector;
+
+    private Map<UUID, Values> pending;
 
     private int index = 0;
 
@@ -28,21 +32,30 @@ public class SentenceSpout extends BaseRichSpout {
 
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         this.collector = spoutOutputCollector;
+        this.pending = new HashMap<>();
     }
 
     public void nextTuple() {
-        /*if (index >= sentences.length) {
-            index = 0;
-        }*/
         if (index < sentences.length) {
-            this.collector.emit(new Values(sentences[index]));
+            Values values = new Values(sentences[index]);
+            UUID msgId = UUID.randomUUID();
+            this.pending.put(msgId, values);
+            this.collector.emit(values, msgId);
             index++;
         }
-
-       // Utils.sleep(1000);
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declare(new Fields("sentence"));
+    }
+
+    @Override
+    public void ack(Object msgId) {
+        this.pending.remove(msgId);
+    }
+
+    @Override
+    public void fail(Object msgId) {
+        this.collector.emit(this.pending.get(msgId), msgId);
     }
 }
