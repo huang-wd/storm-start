@@ -26,18 +26,27 @@ public class WordCountTopology {
         ReportBolt reportBolt = new ReportBolt();
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout(SENTENCE_SPOUT_ID, sentenceSpout);
+        builder.setSpout(SENTENCE_SPOUT_ID, sentenceSpout, 2);
+
         // SentenceSpout --> SplitSentenceBolt
-        builder.setBolt(SPLIT_BOLT_ID, splitBolt).shuffleGrouping(SENTENCE_SPOUT_ID);
+        builder.setBolt(SPLIT_BOLT_ID, splitBolt, 2)
+                .setNumTasks(4)
+                .shuffleGrouping(SENTENCE_SPOUT_ID);
+
         // SplitSentenceBolt --> WordCountBolt
-        builder.setBolt(COUNT_BOLT_ID, countBolt).fieldsGrouping(SPLIT_BOLT_ID, new Fields("word"));
+        builder.setBolt(COUNT_BOLT_ID, countBolt, 4)
+                .fieldsGrouping(SPLIT_BOLT_ID, new Fields("word"));
+
         // WordCountBolt --> ReportBolt
-        builder.setBolt(REPORT_BOLT_ID, reportBolt).globalGrouping(COUNT_BOLT_ID);
+        builder.setBolt(REPORT_BOLT_ID, reportBolt)
+                .globalGrouping(COUNT_BOLT_ID);
 
         Config config = new Config();
+        config.setNumWorkers(1);
+
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
-        Utils.sleep(60000);
+        Utils.sleep(10000);
         cluster.killTopology(TOPOLOGY_NAME);
         cluster.shutdown();
     }

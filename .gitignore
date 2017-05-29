@@ -138,10 +138,8 @@ local.properties
 .worksheet
 
 /.idea/
-/storm-start.iml
-chapter1/src/main/resources/
-chapter1/src/test/
-storm-start.iml
-/chapter1/chapter1.iml
-chapter1/target/
+*/target/
 /logs/
+/*.iml
+/*/chapter1.iml
+
