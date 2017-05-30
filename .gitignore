@@ -141,5 +141,5 @@ local.properties
 */target/
 /logs/
 /*.iml
-/*/chapter1.iml
+/*/*.iml
 
