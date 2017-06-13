@@ -28,10 +28,14 @@ public class LogAnalysisTopology {
         TridentKafkaConfig spoutConf = new TridentKafkaConfig(zkHosts, "foo");
 
         spoutConf.scheme = new SchemeAsMultiScheme(new StringScheme());
+        spoutConf.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
+
         OpaqueTridentKafkaSpout spout = new OpaqueTridentKafkaSpout(spoutConf);
 
         Stream spoutStream = topology.newStream("kafka-stream", spout);
+
         Fields jsonFields = new Fields("level", "timestamp", "message", "logger");
+
         Stream parsedStream = spoutStream.each(new Fields("str"), new JsonProjectFunction(jsonFields), jsonFields);
 
         //drop the unparsed JSON to reduce tuple size
